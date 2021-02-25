@@ -95,9 +95,8 @@ int main(void) {
 	/* USER CODE BEGIN 2 */
 	uint16_t TruePassword[11] = { 1000000, 1000000000, 10000000000, 10000,
 			1000000000000, 100000, 1000000000000, 1000000000000, 1000000000000,
-			100000000, 10 }; // [1E6,1E9,1E10,1E4,1E12,1E5,1E12,1E12,1E12,1E8,1E1]
-	uint16_t ClearPassword[11] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-	uint16_t PasswordMemory[11];
+			100000000, 10 }; // [1E6,1E9,1E10,1E4,1E12,1E5,1E12,1E12,1E12,1E8,1E1][62340500018]
+	uint16_t PasswordMemory[11] ;
 	uint8_t Count = 0;
 	/* USER CODE END 2 */
 
@@ -114,11 +113,18 @@ int main(void) {
 			if (ButtonMatrixState == 1000000000000000) {
 				if (PasswordMemory == TruePassword) {
 					HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+					printf(PasswordMemory[11]);
 				}
 			}
+			else if (ButtonMatrixState == 1000) {
+						PasswordMemory[11] = 0;
+						printf(PasswordMemory[11]);
+					}
+//			else
+//			{
+//				break;
+//			}
 			Count = (Count + 1) % 11;
-		} else if (ButtonMatrixState == 1000) {
-			PasswordMemory = ClearPassword;
 		} else {
 			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
 		}
