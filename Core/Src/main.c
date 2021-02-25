@@ -93,11 +93,7 @@ int main(void) {
 	MX_GPIO_Init();
 	MX_USART2_UART_Init();
 	/* USER CODE BEGIN 2 */
-	uint16_t TruePassword[11] = { 1000000, 1000000000, 10000000000, 10000,
-			1000000000000, 100000, 1000000000000, 1000000000000, 1000000000000,
-			100000000, 10 }; // [1E6,1E9,1E10,1E4,1E12,1E5,1E12,1E12,1E12,1E8,1E1][62340500018]
-	uint16_t PasswordMemory[11] ;
-	uint8_t Count = 0;
+
 	/* USER CODE END 2 */
 
 	/* Infinite loop */
@@ -106,29 +102,16 @@ int main(void) {
 		/* USER CODE END WHILE */
 
 		/* USER CODE BEGIN 3 */
+		/*-----------------Key Map-------------------------------------------------------------
+						7	8	9	Clear					1E0		1E1		1E2		1E3
+						4	5	6	Backspace*		--\		1E4		1E5		1E6		1E7*
+						1	2	3					--/		1E8		1E9		1E10	1E11
+						0			Enter					1E12	1E13	1E14	1E15
+		--------------------------------------------------------------------------------------*/
+
 		//function button
 		ButtonMatrixUpdate();
-		if (ButtonMatrixState != 0) {
-			PasswordMemory[Count] = ButtonMatrixState;
-			if (ButtonMatrixState == 1000000000000000) {
-				if (PasswordMemory == TruePassword) {
-					HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
-					printf(PasswordMemory[11]);
-				}
-			}
-			else if (ButtonMatrixState == 1000) {
-						PasswordMemory[11] = 0;
-						printf(PasswordMemory[11]);
-					}
-//			else
-//			{
-//				break;
-//			}
-			Count = (Count + 1) % 11;
-		} else {
-			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
-		}
-	}
+
 	/* USER CODE END 3 */
 }
 

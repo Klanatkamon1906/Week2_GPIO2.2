@@ -21,29 +21,29 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, ALLOC, LOAD, DATA
   8 .data         000000a0  20000000  08003284  00020000  2**2
                   CONTENTS, ALLOC, LOAD, DATA
-  9 .bss          0000007c  200000a0  08003324  000200a0  2**2
+  9 .bss          00000080  200000a0  08003324  000200a0  2**2
                   ALLOC
- 10 ._user_heap_stack 00000604  2000011c  08003324  0002011c  2**0
+ 10 ._user_heap_stack 00000600  20000120  08003324  00020120  2**0
                   ALLOC
  11 .ARM.attributes 00000030  00000000  00000000  000200a0  2**0
                   CONTENTS, READONLY
- 12 .debug_info   00006fe3  00000000  00000000  000200d0  2**0
+ 12 .debug_info   00006ffa  00000000  00000000  000200d0  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_abbrev 00001534  00000000  00000000  000270b3  2**0
+ 13 .debug_abbrev 00001534  00000000  00000000  000270ca  2**0
                   CONTENTS, READONLY, DEBUGGING
- 14 .debug_aranges 000006a8  00000000  00000000  000285e8  2**3
+ 14 .debug_aranges 000006a8  00000000  00000000  00028600  2**3
                   CONTENTS, READONLY, DEBUGGING
- 15 .debug_ranges 000005f0  00000000  00000000  00028c90  2**3
+ 15 .debug_ranges 000005f0  00000000  00000000  00028ca8  2**3
                   CONTENTS, READONLY, DEBUGGING
- 16 .debug_macro  00015e25  00000000  00000000  00029280  2**0
+ 16 .debug_macro  00015e25  00000000  00000000  00029298  2**0
                   CONTENTS, READONLY, DEBUGGING
- 17 .debug_line   00005bb2  00000000  00000000  0003f0a5  2**0
+ 17 .debug_line   00005bb2  00000000  00000000  0003f0bd  2**0
                   CONTENTS, READONLY, DEBUGGING
- 18 .debug_str    00086147  00000000  00000000  00044c57  2**0
+ 18 .debug_str    00086153  00000000  00000000  00044c6f  2**0
                   CONTENTS, READONLY, DEBUGGING
- 19 .comment      0000007b  00000000  00000000  000cad9e  2**0
+ 19 .comment      0000007b  00000000  00000000  000cadc2  2**0
                   CONTENTS, READONLY
- 20 .debug_frame  000020ac  00000000  00000000  000cae1c  2**2
+ 20 .debug_frame  000020ac  00000000  00000000  000cae40  2**2
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -459,7 +459,7 @@ int main(void) {
  80005aa:	8021      	strh	r1, [r4, #0]
 			1000000000000, 100000, 1000000000000, 1000000000000, 1000000000000,
 			100000000, 10 }; // [1E6,1E9,1E10,1E4,1E12,1E5,1E12,1E12,1E12,1E8,1E1][62340500018]
-	uint16_t PasswordMemory[11] ;
+	uint16_t PasswordMemory[11];
 	uint8_t Count = 0;
  80005ac:	2300      	movs	r3, #0
  80005ae:	f887 302f 	strb.w	r3, [r7, #47]	; 0x2f
@@ -474,63 +474,60 @@ int main(void) {
  80005b6:	4b1a      	ldr	r3, [pc, #104]	; (8000620 <main+0xa0>)
  80005b8:	881b      	ldrh	r3, [r3, #0]
  80005ba:	2b00      	cmp	r3, #0
- 80005bc:	d027      	beq.n	800060e <main+0x8e>
-			PasswordMemory[Count] = ButtonMatrixState;
- 80005be:	f897 302f 	ldrb.w	r3, [r7, #47]	; 0x2f
- 80005c2:	4a17      	ldr	r2, [pc, #92]	; (8000620 <main+0xa0>)
- 80005c4:	8812      	ldrh	r2, [r2, #0]
- 80005c6:	005b      	lsls	r3, r3, #1
- 80005c8:	f107 0130 	add.w	r1, r7, #48	; 0x30
- 80005cc:	440b      	add	r3, r1
- 80005ce:	f823 2c30 	strh.w	r2, [r3, #-48]
+ 80005bc:	d028      	beq.n	8000610 <main+0x90>
+			if (ButtonMatrixState == 1000000000000000) {
 				if (PasswordMemory == TruePassword) {
 					HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
 					printf(PasswordMemory[11]);
 				}
+			} else if (ButtonMatrixState == 1000) {
+ 80005be:	4b18      	ldr	r3, [pc, #96]	; (8000620 <main+0xa0>)
+ 80005c0:	881b      	ldrh	r3, [r3, #0]
+ 80005c2:	f5b3 7f7a 	cmp.w	r3, #1000	; 0x3e8
+ 80005c6:	d106      	bne.n	80005d6 <main+0x56>
+				PasswordMemory[11] = 0;
+ 80005c8:	2300      	movs	r3, #0
+ 80005ca:	82fb      	strh	r3, [r7, #22]
+				printf(PasswordMemory[11]);
+ 80005cc:	8afb      	ldrh	r3, [r7, #22]
+ 80005ce:	4618      	mov	r0, r3
+ 80005d0:	f001 fefc 	bl	80023cc <iprintf>
+ 80005d4:	e7ed      	b.n	80005b2 <main+0x32>
+			} else {
+				PasswordMemory[Count] = ButtonMatrixState;
+ 80005d6:	f897 302f 	ldrb.w	r3, [r7, #47]	; 0x2f
+ 80005da:	4a11      	ldr	r2, [pc, #68]	; (8000620 <main+0xa0>)
+ 80005dc:	8812      	ldrh	r2, [r2, #0]
+ 80005de:	005b      	lsls	r3, r3, #1
+ 80005e0:	f107 0130 	add.w	r1, r7, #48	; 0x30
+ 80005e4:	440b      	add	r3, r1
+ 80005e6:	f823 2c30 	strh.w	r2, [r3, #-48]
+				Count = (Count + 1) % 11;
+ 80005ea:	f897 302f 	ldrb.w	r3, [r7, #47]	; 0x2f
+ 80005ee:	1c59      	adds	r1, r3, #1
+ 80005f0:	4b0c      	ldr	r3, [pc, #48]	; (8000624 <main+0xa4>)
+ 80005f2:	fb83 2301 	smull	r2, r3, r3, r1
+ 80005f6:	105a      	asrs	r2, r3, #1
+ 80005f8:	17cb      	asrs	r3, r1, #31
+ 80005fa:	1ad2      	subs	r2, r2, r3
+ 80005fc:	4613      	mov	r3, r2
+ 80005fe:	009b      	lsls	r3, r3, #2
+ 8000600:	4413      	add	r3, r2
+ 8000602:	005b      	lsls	r3, r3, #1
+ 8000604:	4413      	add	r3, r2
+ 8000606:	1aca      	subs	r2, r1, r3
+ 8000608:	4613      	mov	r3, r2
+ 800060a:	f887 302f 	strb.w	r3, [r7, #47]	; 0x2f
+ 800060e:	e7d0      	b.n	80005b2 <main+0x32>
 			}
-			else if (ButtonMatrixState == 1000) {
- 80005d2:	4b13      	ldr	r3, [pc, #76]	; (8000620 <main+0xa0>)
- 80005d4:	881b      	ldrh	r3, [r3, #0]
- 80005d6:	f5b3 7f7a 	cmp.w	r3, #1000	; 0x3e8
- 80005da:	d105      	bne.n	80005e8 <main+0x68>
-						PasswordMemory[11] = 0;
- 80005dc:	2300      	movs	r3, #0
- 80005de:	82fb      	strh	r3, [r7, #22]
-						printf(PasswordMemory[11]);
- 80005e0:	8afb      	ldrh	r3, [r7, #22]
- 80005e2:	4618      	mov	r0, r3
- 80005e4:	f001 fef2 	bl	80023cc <iprintf>
-					}
-//			else
-//			{
-//				break;
-//			}
-			Count = (Count + 1) % 11;
- 80005e8:	f897 302f 	ldrb.w	r3, [r7, #47]	; 0x2f
- 80005ec:	1c59      	adds	r1, r3, #1
- 80005ee:	4b0d      	ldr	r3, [pc, #52]	; (8000624 <main+0xa4>)
- 80005f0:	fb83 2301 	smull	r2, r3, r3, r1
- 80005f4:	105a      	asrs	r2, r3, #1
- 80005f6:	17cb      	asrs	r3, r1, #31
- 80005f8:	1ad2      	subs	r2, r2, r3
- 80005fa:	4613      	mov	r3, r2
- 80005fc:	009b      	lsls	r3, r3, #2
- 80005fe:	4413      	add	r3, r2
- 8000600:	005b      	lsls	r3, r3, #1
- 8000602:	4413      	add	r3, r2
- 8000604:	1aca      	subs	r2, r1, r3
- 8000606:	4613      	mov	r3, r2
- 8000608:	f887 302f 	strb.w	r3, [r7, #47]	; 0x2f
- 800060c:	e7d1      	b.n	80005b2 <main+0x32>
 		} else {
 			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
- 800060e:	2200      	movs	r2, #0
- 8000610:	2120      	movs	r1, #32
- 8000612:	4805      	ldr	r0, [pc, #20]	; (8000628 <main+0xa8>)
- 8000614:	f000 fe62 	bl	80012dc <HAL_GPIO_WritePin>
+ 8000610:	2200      	movs	r2, #0
+ 8000612:	2120      	movs	r1, #32
+ 8000614:	4804      	ldr	r0, [pc, #16]	; (8000628 <main+0xa8>)
+ 8000616:	f000 fe61 	bl	80012dc <HAL_GPIO_WritePin>
 		ButtonMatrixUpdate();
- 8000618:	e7cb      	b.n	80005b2 <main+0x32>
- 800061a:	bf00      	nop
+ 800061a:	e7ca      	b.n	80005b2 <main+0x32>
  800061c:	080031ac 	.word	0x080031ac
  8000620:	200000bc 	.word	0x200000bc
  8000624:	2e8ba2e9 	.word	0x2e8ba2e9
@@ -731,7 +728,7 @@ static void MX_USART2_UART_Init(void) {
  8000746:	bf00      	nop
  8000748:	bd80      	pop	{r7, pc}
  800074a:	bf00      	nop
- 800074c:	200000d4 	.word	0x200000d4
+ 800074c:	200000d8 	.word	0x200000d8
  8000750:	40004400 	.word	0x40004400
 
 08000754 <MX_GPIO_Init>:
@@ -1118,6 +1115,8 @@ void ButtonMatrixUpdate() {
 				ButtonMatrixPin[NextOutputPin], GPIO_PIN_RESET);
 
 	}
+//	*PasswordGet = ButtonMatrixState;
+//	return *PasswordGete;
 }
  80009d6:	bf00      	nop
  80009d8:	3708      	adds	r7, #8
@@ -1826,7 +1825,7 @@ LoopFillZerobss:
   ldr  r2, =_sbss
  8000cec:	200000a0 	.word	0x200000a0
   ldr  r3, = _ebss
- 8000cf0:	2000011c 	.word	0x2000011c
+ 8000cf0:	20000120 	.word	0x20000120
 
 08000cf4 <ADC_IRQHandler>:
  * @retval None       
@@ -1989,7 +1988,7 @@ __weak void HAL_IncTick(void)
  8000db8:	4770      	bx	lr
  8000dba:	bf00      	nop
  8000dbc:	20000038 	.word	0x20000038
- 8000dc0:	20000114 	.word	0x20000114
+ 8000dc0:	20000118 	.word	0x20000118
 
 08000dc4 <HAL_GetTick>:
   * @note This function is declared as __weak to be overwritten in case of other 
@@ -2009,7 +2008,7 @@ __weak uint32_t HAL_GetTick(void)
  8000dd0:	f85d 7b04 	ldr.w	r7, [sp], #4
  8000dd4:	4770      	bx	lr
  8000dd6:	bf00      	nop
- 8000dd8:	20000114 	.word	0x20000114
+ 8000dd8:	20000118 	.word	0x20000118
 
 08000ddc <__NVIC_SetPriorityGrouping>:
            In case of a conflict between priority grouping and available
@@ -6168,7 +6167,7 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
  8002bea:	b103      	cbz	r3, 8002bee <_sbrk_r+0x1a>
  8002bec:	602b      	str	r3, [r5, #0]
  8002bee:	bd38      	pop	{r3, r4, r5, pc}
- 8002bf0:	20000118 	.word	0x20000118
+ 8002bf0:	2000011c 	.word	0x2000011c
 
 08002bf4 <__sread>:
  8002bf4:	b510      	push	{r4, lr}
@@ -6322,7 +6321,7 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
  8002d3a:	b103      	cbz	r3, 8002d3e <_write_r+0x1e>
  8002d3c:	602b      	str	r3, [r5, #0]
  8002d3e:	bd38      	pop	{r3, r4, r5, pc}
- 8002d40:	20000118 	.word	0x20000118
+ 8002d40:	2000011c 	.word	0x2000011c
 
 08002d44 <__swsetup_r>:
  8002d44:	4b32      	ldr	r3, [pc, #200]	; (8002e10 <__swsetup_r+0xcc>)
@@ -6432,7 +6431,7 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
  8002e36:	b103      	cbz	r3, 8002e3a <_close_r+0x1a>
  8002e38:	602b      	str	r3, [r5, #0]
  8002e3a:	bd38      	pop	{r3, r4, r5, pc}
- 8002e3c:	20000118 	.word	0x20000118
+ 8002e3c:	2000011c 	.word	0x2000011c
 
 08002e40 <__sflush_r>:
  8002e40:	898a      	ldrh	r2, [r1, #12]
@@ -6611,7 +6610,7 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
  8002fba:	b103      	cbz	r3, 8002fbe <_lseek_r+0x1e>
  8002fbc:	602b      	str	r3, [r5, #0]
  8002fbe:	bd38      	pop	{r3, r4, r5, pc}
- 8002fc0:	20000118 	.word	0x20000118
+ 8002fc0:	2000011c 	.word	0x2000011c
 
 08002fc4 <__swhatbuf_r>:
  8002fc4:	b570      	push	{r4, r5, r6, lr}
@@ -6797,7 +6796,7 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
  8003146:	b103      	cbz	r3, 800314a <_read_r+0x1e>
  8003148:	602b      	str	r3, [r5, #0]
  800314a:	bd38      	pop	{r3, r4, r5, pc}
- 800314c:	20000118 	.word	0x20000118
+ 800314c:	2000011c 	.word	0x2000011c
 
 08003150 <_fstat_r>:
  8003150:	b538      	push	{r3, r4, r5, lr}
@@ -6815,7 +6814,7 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
  800316a:	602b      	str	r3, [r5, #0]
  800316c:	bd38      	pop	{r3, r4, r5, pc}
  800316e:	bf00      	nop
- 8003170:	20000118 	.word	0x20000118
+ 8003170:	2000011c 	.word	0x2000011c
 
 08003174 <_isatty_r>:
  8003174:	b538      	push	{r3, r4, r5, lr}
@@ -6831,7 +6830,7 @@ static void UART_SetConfig(UART_HandleTypeDef *huart)
  800318a:	b103      	cbz	r3, 800318e <_isatty_r+0x1a>
  800318c:	602b      	str	r3, [r5, #0]
  800318e:	bd38      	pop	{r3, r4, r5, pc}
- 8003190:	20000118 	.word	0x20000118
+ 8003190:	2000011c 	.word	0x2000011c
 
 08003194 <_init>:
  8003194:	b5f8      	push	{r3, r4, r5, r6, r7, lr}
