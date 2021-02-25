@@ -61,7 +61,10 @@ void ButtonMatrixUpdate();
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+uint16_t SystemState[2];
+uint8_t PasswordIsTrue = 0;
+uint64_t PasswordGet = 0;
+uint64_t PasswordCorrect = 62340500018;
 /* USER CODE END 0 */
 
 /**
@@ -103,15 +106,73 @@ int main(void) {
 
 		/* USER CODE BEGIN 3 */
 		/*-----------------Key Map-------------------------------------------------------------
-						7	8	9	Clear					1E0		1E1		1E2		1E3
-						4	5	6	Backspace*		--\		1E4		1E5		1E6		1E7*
-						1	2	3					--/		1E8		1E9		1E10	1E11
-						0			Enter					1E12	1E13	1E14	1E15
-		--------------------------------------------------------------------------------------*/
-
+		 7	8	9	Clear					1E0		1E1		1E2		1E3
+		 4	5	6	Backspace*		--\		1E4		1E5		1E6		1E7*
+		 1	2	3					--/		1E8		1E9		1E10	1E11
+		 0			Enter					1E12	1E13	1E14	1E15
+		 --------------------------------------------------------------------------------------*/
 		//function button
 		ButtonMatrixUpdate();
+		SystemState[0] = ButtonMatrixState;
+		if (SystemState[0] != 0 && SystemState[1] == 0) {
+			uint32_t BlinkTimeStamp = HAL_GetTick(); //Blink 1 time when Pressed
+			while (HAL_GetTick() - BlinkTimeStamp < 300) {
+				HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET); //Set ON RESET OFF
+			}
+			switch (SystemState[0]) {
+			case (0b1):
+				PasswordGet = (PasswordGet * 10) + 7;
+				break;
+			case (0b10):
+				PasswordGet = (PasswordGet * 10) + 8;
+				break;
+			case (0b100):
+				PasswordGet = (PasswordGet * 10) + 9;
+				break;
+			case (0b10000):
+				PasswordGet = (PasswordGet * 10) + 4;
+				break;
+			case (0b100000):
+				PasswordGet = (PasswordGet * 10) + 5;
+				break;
+			case (0b1000000):
+				PasswordGet = (PasswordGet * 10) + 6;
+				break;
+			case (0b100000000):
+				PasswordGet = (PasswordGet * 10) + 1;
+				break;
+			case (0b1000000000):
+				PasswordGet = (PasswordGet * 10) + 2;
+				break;
+			case (0b10000000000):
+				PasswordGet = (PasswordGet * 10) + 3;
+				break;
+			case (0b1000000000000):
+				PasswordGet = (PasswordGet * 10) + 0;
+				break;
+			case (0b1000):								// Clear
+				PasswordGet = 0;
+				break;
+			case (0b10000000):							// BackSpace
+				PasswordGet = PasswordGet / 10;
+				break;
+			case (0b1000000000000000):					// Enter
+				if (PasswordGet == PasswordIsTrue) {
+					PasswordIsTrue = 1;
+				}
+				break;
+			default:
+				break;
+			}
+		}
 
+		if (PasswordIsTrue == 1) {
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+		} else {
+			HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+		}
+		SystemState[1] = SystemState[0];
+	}
 	/* USER CODE END 3 */
 }
 
@@ -278,7 +339,7 @@ void ButtonMatrixUpdate() {
 		for (i = 0; i < 4; i++) { // 0-3
 			GPIO_PinState PinState = HAL_GPIO_ReadPin(ButtonMatrixPort[i],
 					ButtonMatrixPin[i]);
-			if (PinState == GPIO_PIN_RESET) // Button Pressed
+			if (PinState == GPIO_PIN_RESET) // Button is Pressed
 					{
 				ButtonMatrixState |= (uint16_t) 0x1
 						<< (i + ButtonMatrixRow * 4); // 0b0000000000000000 | 0b1000
