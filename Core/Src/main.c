@@ -157,8 +157,11 @@ int main(void) {
 				PasswordGet = PasswordGet / 10;
 				break;
 			case (0b1000000000000000):					// Enter
-				if (PasswordGet == PasswordIsTrue) {
+				if (PasswordGet == PasswordCorrect) {
 					PasswordIsTrue = 1;
+				}
+				else{
+					PasswordIsTrue = 0;
 				}
 				break;
 			default:
